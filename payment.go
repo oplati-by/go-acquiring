@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -50,6 +51,10 @@ type (
 // В случае, если сервер вернул ответ отличный от 200 OK, возвращаемый error можно попробовать привести к *ServerError
 // для получения дополнительных данных об ошибке.
 func (a *Client) CreatePayment(ctx context.Context, payment Payment) (SuccessfulPayment, error) {
+	if len(payment.Items) == 0 {
+		return SuccessfulPayment{}, errors.New("at least one item should be specified in Items")
+	}
+
 	request := a.makePaymentRequest(payment)
 
 	body, err := json.Marshal(&request)
