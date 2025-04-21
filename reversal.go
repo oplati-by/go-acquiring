@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -25,6 +26,10 @@ type (
 // В случае, если сервер вернул ответ отличный от 200 OK, возвращаемый error можно попробовать привести к *ServerError
 // для получения дополнительных данных об ошибке.
 func (a *Client) ReversePayment(ctx context.Context, paymentId int64, payment PaymentReversal) (PaymentInfo, error) {
+	if len(payment.Items) == 0 {
+		return PaymentInfo{}, errors.New("at least one item should be specified in Items")
+	}
+
 	request := a.makeReversePaymentRequest(payment)
 
 	body, err := json.Marshal(&request)
